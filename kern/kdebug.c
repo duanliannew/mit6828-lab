@@ -124,7 +124,7 @@ debuginfo_eip(uintptr_t addr, struct Eipdebuginfo *info)
 		stabstr_end = __STABSTR_END__;
 	} else {
 		// Can't search for user-level addresses yet!
-  	        panic("User address");
+		panic("User address");
 	}
 
 	// String table validity checks
@@ -152,8 +152,9 @@ debuginfo_eip(uintptr_t addr, struct Eipdebuginfo *info)
 	if (lfun <= rfun) {
 		// stabs[lfun] points to the function name
 		// in the string table, but check bounds just in case.
-		if (stabs[lfun].n_strx < stabstr_end - stabstr)
+		if (stabs[lfun].n_strx < stabstr_end - stabstr) {
 			info->eip_fn_name = stabstr + stabs[lfun].n_strx;
+		}
 		info->eip_fn_addr = stabs[lfun].n_value;
 		addr -= info->eip_fn_addr;
 		// Search within the function definition for the line number.
@@ -168,8 +169,6 @@ debuginfo_eip(uintptr_t addr, struct Eipdebuginfo *info)
 	}
 	// Ignore stuff after the colon.
 	info->eip_fn_namelen = strfind(info->eip_fn_name, ':') - info->eip_fn_name;
-
-
 	// Search within [lline, rline] for the line number stab.
 	// If found, set info->eip_line to the right line number.
 	// If not found, return -1.
@@ -179,7 +178,13 @@ debuginfo_eip(uintptr_t addr, struct Eipdebuginfo *info)
 	//	Look at the STABS documentation and <inc/stab.h> to find
 	//	which one.
 	// Your code here.
-
+    stab_binsearch(stabs, &lline, &rline, N_SLINE, addr);
+	if (lline <= rline) {
+		info->eip_line = stabs[lline].n_desc;
+	} else {
+		cprintf("cannot find line number for addr:%x\n", addr);
+		return -1;
+	}
 
 	// Search backwards from the line number for the relevant filename
 	// stab.

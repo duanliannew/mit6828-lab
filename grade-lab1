@@ -15,7 +15,7 @@ def test_printf():
     r.match("6828 decimal is 15254 octal!")
 
 BACKTRACE_RE = r"^ *ebp +f01[0-9a-z]{5} +eip +f0100[0-9a-z]{3} +args +([0-9a-z]+)"
-
+# BACKTRACE_RE = r"ebp f01[0-9a-z]{5} eip f0100[0-9a-z]{3} args ([0-9a-z]+)"
 @test(10, parent=test_jos)
 def test_backtrace_count():
     matches = re.findall(BACKTRACE_RE, r.qemu.output, re.MULTILINE)

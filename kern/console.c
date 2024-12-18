@@ -192,6 +192,9 @@ cga_putc(int c)
 	}
 
 	// What is the purpose of this?
+	// This code fragment ensures that when the cga screen is full,
+	// it refreshes the screen by moving every line up one line, and the original first line is erased,
+	// and the newly last one line is filled with blank
 	if (crt_pos >= CRT_SIZE) {
 		int i;
 

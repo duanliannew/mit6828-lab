@@ -66,6 +66,9 @@ endif
 # try to generate a unique GDB port
 GDBPORT	:= $(shell expr `id -u` % 5000 + 25000)
 
+# use gcc-10, later version do not support -gstabs
+# reference: https://gist.github.com/cobaohieu/ded429cb892b46ae9bfd9919a11e593a
+# in case of link error like "undefined reference to `__udivdi3'", sudo apt-get install gcc-10-multilib
 CC	:= $(GCCPREFIX)gcc -pipe
 AS	:= $(GCCPREFIX)as
 AR	:= $(GCCPREFIX)ar
@@ -198,8 +201,7 @@ endif
 
 grade:
 	@echo $(MAKE) clean
-	@$(MAKE) clean || \
-	  (echo "'make clean' failed.  HINT: Do you have another running instance of JOS?" && exit 1)
+	@$(MAKE) clean || (echo "'make clean' failed.  HINT: Do you have another running instance of JOS?" && exit 1)
 	./grade-lab$(LAB) $(GRADEFLAGS)
 
 git-handin: handin-check
