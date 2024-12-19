@@ -40,20 +40,21 @@ bootmain(void)
 {
 	struct Proghdr *ph, *eph;
 
-	// read 1st page off disk
+	// read 1st page off disk and store it at address 0x10000, that is 64KB
 	readseg((uint32_t) ELFHDR, SECTSIZE*8, 0);
 
 	// is this a valid ELF?
 	if (ELFHDR->e_magic != ELF_MAGIC)
 		goto bad;
 
-	// load each program segment (ignores ph flags)
+	// load each program segment (ignores ph flags), which is above 0x100000, that is 1MB
 	ph = (struct Proghdr *) ((uint8_t *) ELFHDR + ELFHDR->e_phoff);
 	eph = ph + ELFHDR->e_phnum;
-	for (; ph < eph; ph++)
+	for (; ph < eph; ph++) {
 		// p_pa is the load address of this segment (as well
 		// as the physical address)
 		readseg(ph->p_pa, ph->p_memsz, ph->p_offset);
+	}
 
 	// call the entry point from the ELF header
 	// note: does not return!
